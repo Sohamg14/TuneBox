@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<nav class="tabs" aria-label="Library views">
+  <a href="{{ url_for('index', q=q) }}" {% if view == 'all' %}aria-current="page"{% endif %}>All songs</a>
+  <a href="{{ url_for('index', view='liked', q=q) }}" {% if view == 'liked' %}aria-current="page"{% endif %}>Liked</a>
+  <a href="{{ url_for('index', view='mine', q=q) }}" {% if view == 'mine' %}aria-current="page"{% endif %}>My uploads</a>
+</nav>
+
+{% if songs %}
+<ol class="songs">
+  {% for s in songs %}
+  <li class="song" data-id="{{ s.id }}" style="--h: {{ (s.id * 47) % 360 }}">
+    <button class="cover play-btn" aria-label="Play {{ s.title }}"><span class="glyph">▶</span></button>
+    <div class="meta">
+      <strong>{{ s.title }}</strong>
+      <span>{{ s.artist or 'Unknown artist' }}{% if s.genre %} · {{ s.genre }}{% endif %}</span>
+    </div>
+    <span class="by">shared by {{ s.uploader }}</span>
+    <button class="like {{ 'on' if s.liked }}" aria-pressed="{{ 'true' if s.liked else 'false' }}"
+            aria-label="Like {{ s.title }}"><span aria-hidden="true">♥</span> <span class="n">{{ s.like_count }}</span></button>
+    {% if s.uploader_id == user.id %}
+    <form method="post" action="{{ url_for('delete', song_id=s.id) }}"
+          onsubmit="return confirm('Delete this song for everyone?')">
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <button class="link danger">Delete</button>
+    </form>
+    {% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% else %}
+<div class="empty">
+  <h2>{% if q %}Nothing matches “{{ q }}”{% else %}No songs here yet{% endif %}</h2>
+  <p>{% if view == 'liked' %}Tap the heart on a song to keep it here.{% else %}Upload the first track and share it with everyone.{% endif %}</p>
+  <a class="btn" href="{{ url_for('upload') }}">Upload a song</a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block player %}
+<footer class="player" aria-label="Player">
+  <div class="now"><strong id="now-title">Nothing playing</strong><span id="now-artist">Pick a song to start</span></div>
+  <button id="prev" class="ctl" aria-label="Previous song">⏮</button>
+  <audio id="audio" controls preload="none"></audio>
+  <button id="next" class="ctl" aria-label="Next song">⏭</button>
+</footer>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}

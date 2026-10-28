@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Upload · Tunebox{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Upload a song</h1>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Title <input name="title" maxlength="100" required></label>
+    <label>Artist <input name="artist" maxlength="100"></label>
+    <label>Genre <input name="genre" maxlength="30" placeholder="Pop, Lo-fi, Rock…"></label>
+    <label>Audio file (MP3, WAV, OGG or M4A, up to 30 MB)
+      <input type="file" name="audio" accept=".mp3,.wav,.ogg,.m4a,audio/*" required></label>
+    <button class="btn">Upload and share</button>
+  </form>
+  <p class="muted"><a href="{{ url_for('index') }}">Back to songs</a></p>
+</section>
+{% endblock %}
